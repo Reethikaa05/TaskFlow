@@ -6,7 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 const DB_PATH = path.join(__dirname, 'taskmanager.db');
 
 // Delete existing DB if it exists to start fresh
-if (fs.existsSync(DB_PATH)) {
+if (require.main === module && fs.existsSync(DB_PATH)) {
   fs.unlinkSync(DB_PATH);
   console.log('🗑️ Deleted existing database.');
 }
@@ -102,6 +102,10 @@ async function seed() {
   console.log('🎉 Seeding complete! You can now log in with demo accounts.');
 }
 
-seed().catch(err => {
-  console.error('Seeding failed:', err);
-});
+if (require.main === module) {
+  seed().catch(err => {
+    console.error('Seeding failed:', err);
+  });
+} else {
+  module.exports = seed;
+}

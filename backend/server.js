@@ -10,7 +10,21 @@ app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:3000', creden
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-initDb().then(() => {
+const seed = require('./seed');
+const { getDb } = require('./config/database');
+
+initDb().then(async () => {
+  const { queryGet } = getDb();
+  const userCount = queryGet('SELECT COUNT(*) as count FROM users');
+  if (userCount && userCount.count === 0) {
+    console.log('🌱 Database is empty, running auto-seed...');
+    try {
+      await seed();
+    } catch (err) {
+      console.error('Auto-seed failed:', err);
+    }
+  }
+
   app.use('/api/auth', require('./routes/auth'));
   app.use('/api/projects', require('./routes/projects'));
   app.use('/api/projects/:projectId/tasks', require('./routes/tasks'));
