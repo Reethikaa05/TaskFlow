@@ -1,0 +1,6 @@
+node_modules/
+*.db
+.env
+frontend/dist/
+backend/taskmanager.db
+.DS_Store
